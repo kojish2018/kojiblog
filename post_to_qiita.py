@@ -9,44 +9,68 @@ if not QIITA_ACCESS_TOKEN:
 
 QIITA_API_URL = "https://qiita.com/api/v2/items"
 
-def extract_title_and_body(file_path):
-    """Markdownファイルからタイトルと本文を抽出"""
+def extract_metadata(content, key):
+    """Markdownコンテンツから特定のメタデータを抽出"""
+    match = re.search(rf"<!--\s*{key}:\s*(.+?)\s*-->", content)
+    return match.group(1) if match else None
+
+def update_metadata(file_path, key, value):
+    """Markdownファイルにメタデータを埋め込む"""
+    with open(file_path, "r", encoding="utf-8") as file:
+        content = file.readlines()
+    
+    # メタデータが既存の場合は更新
+    updated = False
+    for i, line in enumerate(content):
+        if line.strip().startswith(f"<!-- {key}:"):
+            content[i] = f"<!-- {key}: {value} -->\n"
+            updated = True
+            break
+
+    # 存在しない場合は先頭に追加
+    if not updated:
+        content.insert(0, f"<!-- {key}: {value} -->\n")
+
+    with open(file_path, "w", encoding="utf-8") as file:
+        file.writelines(content)
+
+def post_or_update_qiita(file_path):
+    """Qiita記事を投稿または更新"""
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
-
-    # YAMLフロントマターからタイトルを抽出
-    match = re.search(r"^---\ntitle: (.+)\n---\n", content)
-    if match:
-        title = match.group(1)
-        body = content[match.end():].strip()  # タイトル以外の部分を本文とする
-    else:
-        # タイトルが明示されていない場合は、ファイル名をタイトルにする
+    
+    # メタデータの取得
+    article_id = extract_metadata(content, "id")
+    title = extract_metadata(content, "title")
+    if not title:
         title = os.path.basename(file_path).replace(".md", "")
-        body = content
 
-    return title, body
-
-def post_to_qiita(file_path):
-    """MarkdownファイルをQiitaに投稿する"""
-    title, body = extract_title_and_body(file_path)
-
-    # Qiita APIリクエストデータ
+    # リクエスト共通部分
     headers = {"Authorization": f"Bearer {QIITA_ACCESS_TOKEN}"}
     data = {
         "title": title,
-        "body": body,
+        "body": content,
         "tags": [{"name": "GitHub"}, {"name": "Qiita"}, {"name": "Automation"}],
         "private": False  # 公開記事
     }
 
-    response = requests.post(QIITA_API_URL, headers=headers, json=data)
-
-    if response.status_code == 201:
-        print(f"Successfully posted: {title}")
-        return True
+    # 投稿または更新
+    if article_id:
+        # 更新
+        response = requests.put(f"{QIITA_API_URL}/{article_id}", headers=headers, json=data)
     else:
-        print(f"Failed to post {title}: {response.status_code} - {response.text}")
-        return False
+        # 投稿
+        response = requests.post(QIITA_API_URL, headers=headers, json=data)
+    
+    # 結果を確認
+    if response.status_code in [200, 201]:
+        result = response.json()
+        print(f"Successfully processed: {title}")
+        # 記事IDを保存
+        if not article_id:
+            update_metadata(file_path, "id", result["id"])
+    else:
+        print(f"Failed to process {title}: {response.status_code} - {response.text}")
 
 if __name__ == "__main__":
     # Markdownファイルを取得
@@ -54,6 +78,6 @@ if __name__ == "__main__":
     if not files:
         print("No Markdown files found in /articles.")
         exit(1)
-
+    
     for file_path in files:
-        post_to_qiita(file_path)
+        post_or_update_qiita(file_path)
