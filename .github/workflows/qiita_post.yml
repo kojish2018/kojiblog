@@ -3,7 +3,7 @@ name: Post to Qiita
 on:
   push:
     branches:
-      - main
+      - master  
 
 jobs:
   post_to_qiita:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Post Articles to Qiita
         env:
-          QIITA_ACCESS_TOKEN: ${{ secrets.QIITA_ACCESS_TOKEN }}  # Secretsを環境変数として設定
+          QIITA_ACCESS_TOKEN: ${{ secrets.QIITA_ACCESS_TOKEN }}
         run: python post_to_qiita.py
 
       - name: Commit Qiita Post Logs
