@@ -1,6 +1,5 @@
-<!-- id: abc1234567890 -->
-<!-- title: Qiita記事の自動更新方法 -->
+<!-- title: Qiita記事の自動更新方法3テストテスト -->
 
-# Qiita記事の自動更新方法
+# test2
 
-GitHub Actionsを活用して、Qiita記事を自動的に更新する方法を紹介します。
+test2 Test2 テスト2
