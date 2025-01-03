@@ -2,6 +2,7 @@ import os
 import requests
 import json
 import glob
+import re
 
 # Qiita APIの設定
 QIITA_ACCESS_TOKEN = os.getenv("QIITA_ACCESS_TOKEN")
@@ -27,13 +28,26 @@ def save_config(config):
         json.dump(config, file, ensure_ascii=False, indent=4)
 
 
+def extract_title_from_content(content):
+    """Markdownファイルの内容からタイトルを抽出"""
+    match = re.search(r"<!--\s*title:\s*(.+?)\s*-->", content)
+    if match:
+        return match.group(1).strip()
+    else:
+        raise ValueError("Markdownファイル内に<!-- title: タイトル名 -->が見つかりません。")
+
+
 def post_or_update_qiita(file_path, config):
     """Qiita記事を投稿または更新"""
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
 
-    # 記事タイトルをファイル名から取得
-    title = os.path.basename(file_path).replace(".md", "")
+    # Markdownファイル内のタイトルを抽出
+    try:
+        title = extract_title_from_content(content)
+    except ValueError as e:
+        print(f"Error in file {file_path}: {e}")
+        return
 
     # config.jsonから記事IDを取得
     article_id = config.get(file_path)
