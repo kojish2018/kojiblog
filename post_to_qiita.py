@@ -92,7 +92,7 @@ def post_or_update_qiita(file_path, config):
     data = {
         "title": title,
         "body": content,
-        "tags": [{"name": "GitHub"}, {"name": "Qiita"}, {"name": "Automation"}],
+        "tags": [{"name": "botter"}, {"name": "仮想通貨"}, {"name": "機械学習"}],
         "private": False,  # 公開記事
     }
 
