@@ -3,6 +3,7 @@ import requests
 import json
 import glob
 import re
+import boto3
 
 # Qiita APIの設定
 QIITA_ACCESS_TOKEN = os.getenv("QIITA_ACCESS_TOKEN")
@@ -11,21 +12,55 @@ if not QIITA_ACCESS_TOKEN:
 QIITA_API_URL = "https://qiita.com/api/v2/items"
 
 # Configファイルのパス
-CONFIG_FILE = "config.json"
+# CONFIG_FILE = "config.json"
 
+# def load_config():
+#     """config.jsonを読み込む"""
+#     if os.path.exists(CONFIG_FILE):
+#         with open(CONFIG_FILE, "r", encoding="utf-8") as file:
+#             return json.load(file)
+#     return {}
+
+def load_config_from_s3(bucket_name, object_key):
+    """S3からconfig.jsonを読み込む"""
+    print('s3読み込み')
+    s3 = boto3.client('s3')
+    try:
+        response = s3.get_object(Bucket=bucket_name, Key=object_key)
+        content = response['Body'].read().decode('utf-8')
+        return json.loads(content)
+    except Exception as e:
+        print(f"Error loading config from S3: {e}")
+        return {}
+
+
+# def save_config(config):
+#     """config.jsonに保存する"""
+#     with open(CONFIG_FILE, "w", encoding="utf-8") as file:
+#         json.dump(config, file, ensure_ascii=False, indent=4)
+
+def save_config_to_s3(config, bucket_name, object_key):
+    """S3にconfig.jsonを保存する"""
+    print('s3書き込み')
+
+    s3 = boto3.client('s3')
+    try:
+        content = json.dumps(config, ensure_ascii=False, indent=4)
+        s3.put_object(Bucket=bucket_name, Key=object_key, Body=content.encode('utf-8'))
+    except Exception as e:
+        print(f"Error saving config to S3: {e}")
 
 def load_config():
-    """config.jsonを読み込む"""
-    if os.path.exists(CONFIG_FILE):
-        with open(CONFIG_FILE, "r", encoding="utf-8") as file:
-            return json.load(file)
-    return {}
-
+    """S3からconfig.jsonを読み込む"""
+    bucket_name = 'kojiblog'
+    object_key = 'config.json'
+    return load_config_from_s3(bucket_name, object_key)
 
 def save_config(config):
-    """config.jsonに保存する"""
-    with open(CONFIG_FILE, "w", encoding="utf-8") as file:
-        json.dump(config, file, ensure_ascii=False, indent=4)
+    """S3にconfig.jsonを保存する"""
+    bucket_name = 'kojiblog'
+    object_key = 'config.json'
+    save_config_to_s3(config, bucket_name, object_key)
 
 
 def extract_title_from_content(content):
