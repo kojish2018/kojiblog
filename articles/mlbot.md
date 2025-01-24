@@ -2,10 +2,10 @@
 
 # 収益
 
-![mlbotimg](https://qiitaimgkoji.s3.amazonaws.com/IMG-9688.jpg)
+![mlbotimg](https://qiitaimgkoji.s3.ap-northeast-1.amazonaws.com/IMG_9688.jpg)
 
-![mlbotimg](https://qiitaimgkoji.s3.amazonaws.com/IMG-9689.jpg)
+![mlbotimg](https://qiitaimgkoji.s3.ap-northeast-1.amazonaws.com/IMG_9689.jpg)
 
-![mlbotimg](https://qiitaimgkoji.s3.amazonaws.com/IMG-9690.jpg)
+![mlbotimg](https://qiitaimgkoji.s3.ap-northeast-1.amazonaws.com/IMG_9690.jpg)
 
 
