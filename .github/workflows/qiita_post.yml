@@ -19,7 +19,14 @@ jobs:
           python-version: "3.x"
 
       - name: Install Dependencies
-        run: pip install requests
+        run: pip install boto3 requests
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
 
       - name: Post Articles to Qiita
         env:
