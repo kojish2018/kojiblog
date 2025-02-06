@@ -1,4 +1,5 @@
 <!-- title: hyperliquidのヒストリカルohlcv取得方法 -->
+<!-- tags: Python, Hyperliquid, Botter -->
 
 # hyperliquid の ohlcv 取得コード
 

@@ -11,16 +11,6 @@ if not QIITA_ACCESS_TOKEN:
     raise ValueError("Qiita access token is not set in environment variables.")
 QIITA_API_URL = "https://qiita.com/api/v2/items"
 
-# Configファイルのパス
-# CONFIG_FILE = "config.json"
-
-# def load_config():
-#     """config.jsonを読み込む"""
-#     if os.path.exists(CONFIG_FILE):
-#         with open(CONFIG_FILE, "r", encoding="utf-8") as file:
-#             return json.load(file)
-#     return {}
-
 def load_config_from_s3(bucket_name, object_key):
     """S3からconfig.jsonを読み込む"""
     print('s3読み込み')
@@ -33,16 +23,9 @@ def load_config_from_s3(bucket_name, object_key):
         print(f"Error loading config from S3: {e}")
         return {}
 
-
-# def save_config(config):
-#     """config.jsonに保存する"""
-#     with open(CONFIG_FILE, "w", encoding="utf-8") as file:
-#         json.dump(config, file, ensure_ascii=False, indent=4)
-
 def save_config_to_s3(config, bucket_name, object_key):
     """S3にconfig.jsonを保存する"""
     print('s3書き込み')
-
     s3 = boto3.client('s3')
     try:
         content = json.dumps(config, ensure_ascii=False, indent=4)
@@ -62,7 +45,6 @@ def save_config(config):
     object_key = 'config.json'
     save_config_to_s3(config, bucket_name, object_key)
 
-
 def extract_title_from_content(content):
     """Markdownファイルの内容からタイトルを抽出"""
     match = re.search(r"<!--\s*title:\s*(.+?)\s*-->", content)
@@ -71,18 +53,30 @@ def extract_title_from_content(content):
     else:
         raise ValueError("Markdownファイル内に<!-- title: タイトル名 -->が見つかりません。")
 
+def extract_tags_from_content(content):
+    """Markdownファイルの内容からタグを抽出"""
+    match = re.search(r"<!--\s*tags:\s*(.+?)\s*-->", content)
+    if match:
+        tags = [tag.strip() for tag in match.group(1).split(",")]
+        return [{"name": tag} for tag in tags if tag]
+    return []
 
 def post_or_update_qiita(file_path, config):
     """Qiita記事を投稿または更新"""
     with open(file_path, "r", encoding="utf-8") as file:
         content = file.read()
 
-    # Markdownファイル内のタイトルを抽出
+    # Markdownファイル内のタイトルとタグを抽出
     try:
         title = extract_title_from_content(content)
+        tags = extract_tags_from_content(content)
     except ValueError as e:
         print(f"Error in file {file_path}: {e}")
         return
+
+    # デフォルトタグ（タグがなかった場合の対策）
+    if not tags:
+        tags = [{"name": "botter"}, {"name": "仮想通貨"}, {"name": "機械学習"}]
 
     # config.jsonから記事IDを取得
     article_id = config.get(file_path)
@@ -92,7 +86,7 @@ def post_or_update_qiita(file_path, config):
     data = {
         "title": title,
         "body": content,
-        "tags": [{"name": "botter"}, {"name": "仮想通貨"}, {"name": "機械学習"}],
+        "tags": tags,
         "private": False,  # 公開記事
     }
 
@@ -125,7 +119,6 @@ def post_or_update_qiita(file_path, config):
             save_config(config)
         else:
             print(f"Failed to create a new article: {response.status_code} - {response.text}")
-
 
 if __name__ == "__main__":
     # Configファイルを読み込み
