@@ -1,5 +1,5 @@
 <!-- title: Nextでdeployする時にどんなサーバーを使うべきか迷った話 -->
-<!-- tags: Next, Typescript, Versel, Netlify, Amplify, EC2 -->
+<!-- tags: Next, Versel, Netlify, Amplify, EC2 -->
 
 個人ブログを開発していて、どのサーバーにデプロイするか迷ったので、まとめてみた。
 
