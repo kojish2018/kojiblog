@@ -35,25 +35,25 @@ Next.js では、ページのレンダリング手法として **SSR（Server-Si
 
 **コード例**:
 
-\```javascript
+```javascript
 // pages/ssr-example.js
 export async function getServerSideProps() {
-const res = await fetch('https://api.example.com/data');
-const data = await res.json();
-return { props: { data } };
+  const res = await fetch("https://api.example.com/data");
+  const data = await res.json();
+  return { props: { data } };
 }
 
 function SSRExample({ data }) {
-return (
-<div>
-<h1>SSR Example</h1>
-<pre>{JSON.stringify(data, null, 2)}</pre>
-</div>
-);
+  return (
+    <div>
+      <h1>SSR Example</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
 }
 
 export default SSRExample;
-\```
+```
 
 このコードでは、ユーザーのリクエストごとに `getServerSideProps` が実行され、最新のデータが取得されます。
 
@@ -84,25 +84,25 @@ export default SSRExample;
 
 **コード例**:
 
-\```javascript
+```javascript
 // pages/ssg-example.js
 export async function getStaticProps() {
-const res = await fetch('https://api.example.com/data');
-const data = await res.json();
-return { props: { data } };
+  const res = await fetch("https://api.example.com/data");
+  const data = await res.json();
+  return { props: { data } };
 }
 
 function SSGExample({ data }) {
-return (
-<div>
-<h1>SSG Example</h1>
-<pre>{JSON.stringify(data, null, 2)}</pre>
-</div>
-);
+  return (
+    <div>
+      <h1>SSG Example</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
 }
 
 export default SSGExample;
-\```
+```
 
 このコードでは、ビルド時に `getStaticProps` が実行され、静的な HTML が生成されます。
 
@@ -133,28 +133,28 @@ export default SSGExample;
 
 **コード例**:
 
-\```javascript
+```javascript
 // pages/isr-example.js
 export async function getStaticProps() {
-const res = await fetch('https://api.example.com/data');
-const data = await res.json();
-return {
-props: { data },
-revalidate: 60, // 60 秒ごとにページを再生成
-};
+  const res = await fetch("https://api.example.com/data");
+  const data = await res.json();
+  return {
+    props: { data },
+    revalidate: 60, // 60 秒ごとにページを再生成
+  };
 }
 
 function ISRExample({ data }) {
-return (
-<div>
-<h1>ISR Example</h1>
-<pre>{JSON.stringify(data, null, 2)}</pre>
-</div>
-);
+  return (
+    <div>
+      <h1>ISR Example</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
 }
 
 export default ISRExample;
-\```
+```
 
 このコードでは、ビルド時に `getStaticProps` が実行され、初回の静的 HTML が生成されます。その後、`revalidate` で指定した秒数（この例では 60 秒）ごとに、バックグラウンドでページが再生成され、最新のデータが反映されます。
 
@@ -186,35 +186,35 @@ React の `useEffect` フックを使用して、クライアントサイドで�
 
 **コード例**:
 
-\```javascript
+```javascript
 // pages/csr-example.js
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 function CSRExample() {
-const [data, setData] = useState(null);
+  const [data, setData] = useState(null);
 
-useEffect(() => {
-async function fetchData() {
-const res = await fetch('https://api.example.com/data');
-const data = await res.json();
-setData(data);
-}
-fetchData();
-}, []);
+  useEffect(() => {
+    async function fetchData() {
+      const res = await fetch("https://api.example.com/data");
+      const data = await res.json();
+      setData(data);
+    }
+    fetchData();
+  }, []);
 
-if (!data) {
-return <div>Loading...</div>;
-}
+  if (!data) {
+    return <div>Loading...</div>;
+  }
 
-return (
-<div>
-<h1>CSR Example</h1>
-<pre>{JSON.stringify(data, null, 2)}</pre>
-</div>
-);
+  return (
+    <div>
+      <h1>CSR Example</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
 }
 
 export default CSRExample;
-\```
+```
 
 このコードでは、コンポーネントのマウント時に `useEffect` フック内でデータを取得し、取得したデータをコンポーネントの状態に保存します。データが取得されるまで「Loading...」と表示し、データ取得後に内容を表示します。

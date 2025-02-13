@@ -9,7 +9,7 @@
 
 ## ライブラリの import:
 
-```
+```python
 import os
 import pandas as pd
 from datetime import datetime, timezone, timedelta
@@ -21,7 +21,7 @@ from hyperliquid.utils import constants
 
 ## インスタンスの作成：
 
-```
+```python
 # Infoクラスのインスタンスを作成
 info = Info(constants.MAINNET_API_URL, skip_ws=True)
 
@@ -34,7 +34,7 @@ WalletAddress の部分は、hyperliquid で使うウォレットのアドレス
 
 ## ohlcv を取得したい銘柄と時間足をリストで設定。後ほどループで回す
 
-```
+```python
 # シンボルと時間枠の設定
 symbolList = ['BTC', 'SOL']
 intervalList = ['15m','1h']
@@ -42,7 +42,7 @@ intervalList = ['15m','1h']
 
 何ヶ月分取得するか設定。どうやら、合計で 5000 個分ほどしか hyperliquid は保持していないようです。どうしても欲しい場合は lz4 データから集計するしかなさそう（めんどくさい）。
 
-```
+```python
 # 現在の時刻を基準に開始時間と終了時間を設定
 end_time = int(datetime.now(timezone.utc).timestamp() * 1000)  # 現在のUNIXタイムスタンプ（ミリ秒単位）
 start_time = int((datetime.now(timezone.utc) - timedelta(days=90)).timestamp() * 1000)  # 現在から90日前
@@ -50,7 +50,7 @@ start_time = int((datetime.now(timezone.utc) - timedelta(days=90)).timestamp() *
 
 ## ohlcv 取得のループ処理：
 
-```
+```python
 for symbol in symbolList:
     for interval in intervalList:
         # ローソク足データを取得
